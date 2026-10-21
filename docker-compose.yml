@@ -1,0 +1,8 @@
+services:
+  temporal-graph:
+    build: .
+    image: temporal-graph-4d
+    ports:
+      - "8080:8080"
+    init: true            # encerra o Xvfb junto com o app
+    restart: unless-stopped
