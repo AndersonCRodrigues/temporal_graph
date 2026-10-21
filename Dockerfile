@@ -1,6 +1,5 @@
 FROM python:3.12-slim
 
-# VTK precisa de OpenGL; sem tela, usa Mesa (software) sobre um X virtual (Xvfb).
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
     xvfb xauth x11-utils \
@@ -17,7 +16,7 @@ USER app
 
 EXPOSE 8080
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-    CMD python -c "import urllib.request as u; u.urlopen('http://localhost:8080/', timeout=3)"
+    CMD python -c "import os, urllib.request as u; u.urlopen(f'http://localhost:{os.environ.get(\"PORT\", \"8080\")}/', timeout=3)"
 
-CMD ["xvfb-run", "-a", "-s", "-screen 0 1280x1024x24", \
-    "temporal-graph", "--host", "0.0.0.0", "--port", "8080", "--server"]
+CMD xvfb-run -a -s "-screen 0 1280x1024x24" \
+    temporal-graph --host 0.0.0.0 --port "${PORT:-8080}" --server
